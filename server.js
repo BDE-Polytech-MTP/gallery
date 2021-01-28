@@ -14,7 +14,7 @@ fastify.register(fastifyStatic, {
     prefixAvoidTrailingSlash: true
 })
 
-fastify.listen(5000, (err, address) => {
+fastify.listen(process.env.PORT || 5000, (err, address) => {
     if (err) throw err
     fastify.log.info(`Server listening on ${address}`)
 })

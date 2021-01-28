@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import 'react-image-lightbox/style.css';
 import Lightbox from 'react-image-lightbox';
 
-const baseURL = 'http://localhost:5000';
+const baseURL = '';
 
 function fetchAlbumsNames() {
   return fetch(`${baseURL}/albums`).then(res => res.json()).then(json => json.dirs)
