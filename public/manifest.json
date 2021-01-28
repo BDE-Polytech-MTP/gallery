@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Galerie BDE",
+  "name": "Galerie photos - BDE de Polytech Montpellier",
   "icons": [
     {
       "src": "favicon.ico",
