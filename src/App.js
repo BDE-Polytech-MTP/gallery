@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import 'react-image-lightbox/style.css';
 import Lightbox from 'react-image-lightbox';
 
-const baseURL = '';
+const baseURL = 'http://localhost:5000';
 
 function fetchAlbumImages(albumName) {
   return fetch(`${baseURL}/albums/${albumName}`).then(res => res.json()).then(json => json.files)
@@ -74,7 +74,7 @@ function DirectoryList(props) {
   })
 
   const open = (newDirectory) => {
-    const newParents = [... displayedDir.parents, displayedDir.name]
+    const newParents = [...displayedDir.parents, displayedDir.name]
     setDisplayedDir({
       parents: newParents,
       name: newDirectory,
@@ -83,7 +83,20 @@ function DirectoryList(props) {
   }
 
   const back = () => {
-    const newParents = [... displayedDir.parents]
+    const newParents = [...displayedDir.parents]
+    const newCurrentDirectory = newParents.pop()
+    setDisplayedDir({
+      parents: newParents,
+      name: newCurrentDirectory,
+      children: null
+    })
+  }
+
+  const goTo = (targetDirectory) => {
+    const newParents = [...displayedDir.parents]
+    while (newParents[newParents.length - 1] !== targetDirectory) {
+      newParents.pop()
+    }
     const newCurrentDirectory = newParents.pop()
     setDisplayedDir({
       parents: newParents,
@@ -94,25 +107,35 @@ function DirectoryList(props) {
 
   useEffect(() => {
     if (displayedDir.children === null) {
-      const path = [... displayedDir.parents, displayedDir.name].join('/')
+      const path = [...displayedDir.parents, displayedDir.name].join('/')
       fetchDirectoryContent(path).then(content => {
-        setDisplayedDir({ ... displayedDir, children: content.dirs })
+        setDisplayedDir({ ...displayedDir, children: content.dirs })
       })
     }
   }, [displayedDir])
 
-  return <ul className="directories">
-    {displayedDir.parents.length > 0 ? <li className="directory" onClick={back}>&lt;</li> : null}
-    {displayedDir.children != null ? displayedDir.children.map(dirToShow => 
-      <Directory 
-        path={[ ... displayedDir.parents, displayedDir.name, dirToShow].join('/')} 
-        dir={dirToShow} 
-        open={() => open(dirToShow)}
-        display={() => props.display([ ... displayedDir.parents, displayedDir.name, dirToShow].join('/'))}
-        key={dirToShow}
-      />
-    ) : null}
-  </ul>
+  return (<>
+      <ol className="breadcrumb">
+        <li>Dossiers: </li>
+      {
+      [...displayedDir.parents, displayedDir.name]
+        .flatMap((value, i) => i === 0 ? [value] : [' > ', value])
+        .map((name, i, ar) => <li key={`${name}${i}`} onClick={i % 2 == 0 && i !== ar.length - 1 ? () => goTo(name) : undefined}>{name === null ? '/' : name}</li>)
+      }
+    </ol>
+    <ul className="directories">
+      {displayedDir.parents.length > 0 ? <li className="directory back" onClick={back}>&lt; Retour</li> : null}
+      {displayedDir.children != null ? displayedDir.children.map(dirToShow => 
+        <Directory 
+          path={[ ...displayedDir.parents, displayedDir.name, dirToShow].join('/')} 
+          dir={dirToShow} 
+          open={() => open(dirToShow)}
+          display={() => props.display([ ...displayedDir.parents, displayedDir.name, dirToShow].join('/'))}
+          key={dirToShow}
+        />
+      ) : null}
+    </ul>
+  </>)
 }
 
 function App() {

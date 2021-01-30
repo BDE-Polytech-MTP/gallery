@@ -26,6 +26,10 @@
   border-bottom: solid black 1px;
 }
 
+.back {
+  font-size: 1em;
+}
+
 .directory:hover {
   background-color: rgb(241, 241, 241);
 }
@@ -37,4 +41,34 @@
 
 .directory strong {
   font-weight: normal;
+}
+
+.breadcrumb {
+  list-style-type: none;
+  background-color: #003865;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  color: white;
+}
+
+.breadcrumb li {
+  display: inline;
+}
+
+.breadcrumb li:nth-child(2n) {
+  padding: 3px;
+  border-radius: 10%;
+  text-decoration: underline;
+}
+
+.breadcrumb li:nth-child(2n):hover {
+  cursor: pointer;
+}
+
+.breadcrumb li:last-child:hover {
+  cursor: default;
+}
+
+.breadcrumb li:last-child {
+  text-decoration: none;
 }
