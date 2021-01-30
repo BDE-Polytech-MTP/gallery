@@ -5,12 +5,12 @@ import Lightbox from 'react-image-lightbox';
 
 const baseURL = '';
 
-function fetchAlbumsNames() {
-  return fetch(`${baseURL}/albums`).then(res => res.json()).then(json => json.dirs)
-}
-
 function fetchAlbumImages(albumName) {
   return fetch(`${baseURL}/albums/${albumName}`).then(res => res.json()).then(json => json.files)
+}
+
+function fetchDirectoryContent(dir) {
+  return fetch(`${baseURL}/albums${dir}`).then(res => res.json())
 }
 
 function AlbumDisplay(props) {
@@ -37,26 +37,92 @@ function AlbumDisplay(props) {
       /> : null
 }
 
-function Album(props) {
+function Directory(props) {
 
-  return <div class="Album">
-    <h1>Album: {props.name}</h1>
-    <button onClick={() => props.onSelect()}>Consulter les photos</button>
-  </div>
+  const [content, setContent] = useState(null)
+
+  const clicked = () => {
+    if (content) {
+      if (content.files.length > 0) {
+        props.display()
+      } else if (content.dirs.length > 0) {
+        props.open()
+      }
+    }
+  }
+
+  useEffect(() => {
+    fetchDirectoryContent(props.path).then(content => setContent(content))
+  }, [props.path])
+
+  return <li className="directory" onClick={clicked}>
+    <em>{props.dir}</em>
+    {
+      content ?
+        <strong>
+          {content.files.length > 0 ? `${content.files.length} photos` : content.dirs.length > 0 ? '>' : null}
+        </strong> : null
+    }
+  </li>
+}
+
+function DirectoryList(props) {
+  const [displayedDir, setDisplayedDir] = useState({
+    parents: [],
+    name: props.dir,
+    children: null
+  })
+
+  const open = (newDirectory) => {
+    const newParents = [... displayedDir.parents, displayedDir.name]
+    setDisplayedDir({
+      parents: newParents,
+      name: newDirectory,
+      children: null
+    })
+  }
+
+  const back = () => {
+    const newParents = [... displayedDir.parents]
+    const newCurrentDirectory = newParents.pop()
+    setDisplayedDir({
+      parents: newParents,
+      name: newCurrentDirectory,
+      children: null
+    })
+  }
+
+  useEffect(() => {
+    if (displayedDir.children === null) {
+      const path = [... displayedDir.parents, displayedDir.name].join('/')
+      fetchDirectoryContent(path).then(content => {
+        setDisplayedDir({ ... displayedDir, children: content.dirs })
+      })
+    }
+  }, [displayedDir])
+
+  return <ul className="directories">
+    {displayedDir.parents.length > 0 ? <li className="directory" onClick={back}>&lt;</li> : null}
+    {displayedDir.children != null ? displayedDir.children.map(dirToShow => 
+      <Directory 
+        path={[ ... displayedDir.parents, displayedDir.name, dirToShow].join('/')} 
+        dir={dirToShow} 
+        open={() => open(dirToShow)}
+        display={() => props.display([ ... displayedDir.parents, displayedDir.name, dirToShow].join('/'))}
+        key={dirToShow}
+      />
+    ) : null}
+  </ul>
 }
 
 function App() {
 
-  const [albums, setAlbums] = useState([])
   const [shownAlbum, setShownAlbum] = useState(null)
 
-  useEffect(() => {
-    fetchAlbumsNames().then(albums => setAlbums(albums))
-  }, [])
-
   return (
-    <div class="App">
-      {albums.map(album => <Album name={album} onSelect={() => setShownAlbum(album)} />)}
+    <div className="App">
+      <h1>Galerie Polytech Montpellier</h1>
+      <DirectoryList dir={null} display={(path) => setShownAlbum(path)} />
       {shownAlbum ? <AlbumDisplay name={shownAlbum} onClose={() => setShownAlbum(null)} /> : null}
     </div>
   );

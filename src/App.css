@@ -1,8 +1,40 @@
+.directories {
+  list-style-type: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .App {
+  padding: 0;
+  margin: 0;
+}
+
+.App h1 {
   text-align: center;
 }
 
-.Album button {
-  background-color: white;
-  border: none;
+.directory:first-child {
+  border-top: solid black 1px;
+}
+
+.directory {
+  display: flex;
+  justify-content: space-between;
+  font-size: 2em;
+  padding: 10px 20px;
+  border-bottom: solid black 1px;
+}
+
+.directory:hover {
+  background-color: rgb(241, 241, 241);
+}
+
+.directory em {
+  font-style: normal;
+  font-variant: small-caps;
+}
+
+.directory strong {
+  font-weight: normal;
 }
