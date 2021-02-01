@@ -17,8 +17,8 @@ function Directory(props) {
     }
   
     useEffect(() => {
-      fetchDirectoryContent(props.path).then(content => setContent(content))
-    }, [props.path])
+      fetchDirectoryContent(props.path, props.password).then(content => setContent(content))
+    }, [props])
   
     return <li className="directory" data-disabled={content === null || content.files.length + content.dirs.length === 0} onClick={clicked}>
       <em>{props.dir}</em>
@@ -73,13 +73,13 @@ function DirectoryList(props) {
     }
   
     useEffect(() => {
-      if (displayedDir.children === null) {
+      if (displayedDir.children === null || displayedDir.children === undefined) {
         const path = [...displayedDir.parents, displayedDir.name].join('/')
-        fetchDirectoryContent(path).then(content => {
+        fetchDirectoryContent(path, props.password).then(content => {
           setDisplayedDir({ ...displayedDir, children: content.dirs })
         })
       }
-    }, [displayedDir])
+    }, [displayedDir, props])
   
     return (<>
         <ol className="breadcrumb">
@@ -99,6 +99,7 @@ function DirectoryList(props) {
             open={() => open(dirToShow)}
             display={() => props.display([ ...displayedDir.parents, displayedDir.name, dirToShow].join('/'))}
             key={dirToShow}
+            password={props.password}
           />
         ) : null}
       </ul>

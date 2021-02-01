@@ -9,8 +9,8 @@ function AlbumLightbox(props) {
     const [index, setIndex] = useState(null)
 
     useEffect(() => {
-        fetchAlbumImages(props.name).then(urls => setUrls(urls.map(url => `${baseURL}/albums/${props.name}/${url}`)))
-    }, [props.name])
+        fetchAlbumImages(props.name, props.password).then(urls => setUrls(urls.map(url => `${baseURL}/albums/${props.name}/${url}`)))
+    }, [props.name, props.password])
 
     useEffect(() => {
         if (index === null && urls.length) {
